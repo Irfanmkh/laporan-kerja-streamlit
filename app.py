@@ -40,6 +40,7 @@ def show_detail_modal(report):
         else:
             st.write("_Tidak ada catatan khusus._")
 
+        st.markdown("**Unduh File Excel:**")
         if report.get('excel_path') and os.path.exists(report['excel_path']):
             with open(report['excel_path'], "rb") as ef:
                 st.download_button(
@@ -234,7 +235,19 @@ else:
             cols[0].write(idx + 1)
             cols[1].write(r['tanggal'])
             cols[2].write(r['judul'])
-            cols[3].markdown(status_html, unsafe_allow_html=True)
+            # --- bisa diunduh
+            if r.get('excel_path') and os.path.exists(r['excel_path']):
+                with open(r['excel_path'], "rb") as ef:
+                    cols[4].download_button(
+                        label=f"📥 {r.get('excel_filename', 'Download')}",
+                        data=ef.read(),
+                        file_name=r.get('excel_filename', 'laporan.xlsx'),
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        key=f"dl_table_{r['id']}"
+                    )
+            else:
+                cols[4].write("-")
+            # -------------------------------------
             cols[4].write(r.get('excel_filename') if r.get('excel_path') else "-")
             cols[5].write(r.get('catatan_khusus') if r.get('catatan_khusus') else "-")
 
