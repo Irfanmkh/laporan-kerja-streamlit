@@ -10,6 +10,14 @@ st.title("Laporan Data Kerja")
 
 JSON_FILE = "data/laporan.json"
 
+def create_slug(title):
+    # Ubah ke huruf kecil
+    slug = title.lower()
+    # Ganti semua karakter selain huruf dan angka menjadi tanda hubung (-)
+    slug = re.sub(r'[^a-z0-9]+', '-', slug)
+    # Hapus tanda hubung di awal/akhir jika ada
+    return slug.strip('-')
+
 # Dialog Modal untuk Detail Laporan
 @st.dialog("Detail Laporan Pekerjaan", width="large")
 def show_detail_modal(report):
@@ -60,22 +68,24 @@ else:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         reports = json.load(f)
 
+    # Tambahkan slug ke masing-masing data laporan
+    for r in reports:
+        r['slug'] = create_slug(r['judul'])
+
     # ---------------------------------------------------------
-    # FITUR SHARE LINK (MEMBACA ENDPOINT PARAMETER URL)
+    # FITUR SHARE LINK (URL PARAMETER MENGGUNAKAN SLUG)
     # ---------------------------------------------------------
-    # Mencegah modal terbuka berkali-kali saat berinteraksi dengan halaman
     if "modal_opened_from_url" not in st.session_state:
         st.session_state.modal_opened_from_url = False
 
-    # Jika ada ?report_id= di URL, cari laporannya dan otomatis buka modal
-    if "report_id" in st.query_params and not st.session_state.modal_opened_from_url:
-        target_id = st.query_params["report_id"]
+    # Membaca URL parameter ?laporan=slug-judul
+    if "laporan" in st.query_params and not st.session_state.modal_opened_from_url:
+        target_slug = st.query_params["laporan"]
         status_map = {'done': 'Selesai', 'in_progress': 'In Progress', 'pending': 'Pending'}
         
-        # Cari laporan berdasarkan ID dari URL
-        target_report = next((r for r in reports if str(r['id']) == str(target_id)), None)
+        # Cari laporan berdasarkan slug, bukan ID
+        target_report = next((r for r in reports if r['slug'] == target_slug), None)
         if target_report:
-            # Set label status agar tidak error saat di-pass ke modal
             target_report['status_label'] = status_map.get(target_report['status'], target_report['status'])
             st.session_state.modal_opened_from_url = True
             show_detail_modal(target_report)
