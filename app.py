@@ -240,7 +240,12 @@ else:
                 status_html = '<span class="status-badge" style="color:#b91c1c;background:#fee2e2;">Pending</span>'
 
             # Ambil timestamp per item (jika Odoo/JSON punya updated_at / write_date)
-            item_ts = format_to_wib(r.get('updated_at') or r.get('write_date') or r['tanggal'])
+            raw_ts = r.get('updated_at') or r.get('write_date')
+
+            if raw_ts and (' ' in str(raw_ts) or 'T' in str(raw_ts)):
+                item_ts = format_to_wib(raw_ts)
+            else:
+                item_ts = last_updated_wib
 
             cols[0].write(idx + 1)
             # Menampilkan Tanggal Laporan & Timestamp GMT+7 di bawahnya
