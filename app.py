@@ -21,8 +21,8 @@ def format_to_wib(dt_input):
     try:
         dt = pd.to_datetime(dt_input)
         if dt.tzinfo is None:
-            # Jika naive datetime, tambahkan offset GMT+7
-            dt = dt.tz_localize(WIB)
+            # Karena Odoo mengirim UTC, set UTC dulu baru convert ke WIB (+7 jam)
+            dt = dt.tz_localize('UTC').tz_convert(WIB)
         else:
             dt = dt.tz_convert(WIB)
         return dt.strftime('%d-%m-%Y %H:%M WIB')
@@ -248,8 +248,11 @@ else:
                 item_ts = last_updated_wib
 
             cols[0].write(idx + 1)
-            # Menampilkan Tanggal Laporan & Timestamp GMT+7 di bawahnya
-            cols[1].markdown(f"**{r['tanggal']}**<div class='timestamp-sub'>last updated: {item_ts}</div>", unsafe_allow_html=True)
+            # Full HTML agar tampilan bersih & jam +7 terhitung sempurna
+            cols[1].markdown(
+                f"<b>{r['tanggal']}</b><br><span style='font-size: 11px; color: #64748b;'>last updated: {item_ts}</span>",
+                unsafe_allow_html=True
+            )
             cols[2].write(r['judul'])
             cols[3].markdown(status_html, unsafe_allow_html=True)
             
