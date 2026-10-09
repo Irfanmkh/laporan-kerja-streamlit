@@ -83,52 +83,66 @@ else:
     if not filtered_reports:
         st.warning("Tidak ada data laporan yang sesuai.")
     else:
-        # Style Custom CSS untuk Tabel Bersih & Responsive
+       
+        # Style Custom CSS untuk Tabel
         st.markdown("""
             <style>
+            .table-header {
+                font-weight: 600;
+                color: #64748b;
+                font-size: 13px;
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 12px;
+                margin-bottom: 4px;
+            }
+
+            .table-row {
+                padding: 10px 0;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            .status-badge {
+                display: inline-block;
+                padding: 4px 9px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+
             .stButton > button {
                 width: 100%;
-                padding: 2px 10px;
+                min-height: 34px;
+                padding: 4px 10px;
                 font-size: 13px;
+                font-weight: 500;
                 border-radius: 6px;
-            }
-            .table-header {
-                font-weight: bold;
-                border-bottom: 2px solid #e5e7eb;
-                padding-bottom: 8px;
-                margin-bottom: 8px;
-            }
-            .table-row {
-                align-items: center;
-                padding: 6px 0;
-                border-bottom: 1px solid #f3f4f6;
             }
             </style>
         """, unsafe_allow_html=True)
 
         # Header Tabel
-        header_cols = st.columns([0.6, 1.2, 3.2, 1.3, 1.8, 1.8, 1.0])
-        header_cols[0].markdown("**No**")
-        header_cols[1].markdown("**Tanggal**")
-        header_cols[2].markdown("**Judul Laporan**")
-        header_cols[3].markdown("**Status**")
-        header_cols[4].markdown("**Lampiran Excel**")
-        header_cols[5].markdown("**Catatan Khusus**")
-        header_cols[6].markdown("**Aksi**")
+        header_cols = st.columns([0.5, 1.1, 3.0, 1.3, 1.8, 2.0, 0.9])
 
-        st.divider()
+        header_cols[0].markdown('<div class="table-header">No</div>', unsafe_allow_html=True)
+        header_cols[1].markdown('<div class="table-header">Tanggal</div>', unsafe_allow_html=True)
+        header_cols[2].markdown('<div class="table-header">Judul Laporan</div>', unsafe_allow_html=True)
+        header_cols[3].markdown('<div class="table-header">Status</div>', unsafe_allow_html=True)
+        header_cols[4].markdown('<div class="table-header">Lampiran Excel</div>', unsafe_allow_html=True)
+        header_cols[5].markdown('<div class="table-header">Catatan Khusus</div>', unsafe_allow_html=True)
+        header_cols[6].markdown('<div class="table-header">Aksi</div>', unsafe_allow_html=True)
 
-        # Baris Data Laporan dengan Tombol Aksi Langsung
+        # Baris Data Laporan
         for idx, r in enumerate(filtered_reports):
-            cols = st.columns([0.6, 1.2, 3.2, 1.3, 1.8, 1.8, 1.0])
-            
-            # Badge Status Warna
+            cols = st.columns([0.5, 1.1, 3.0, 1.3, 1.8, 2.0, 0.9], vertical_alignment="center")
+
+            # Badge Status
             if r['status'] == 'done':
-                status_html = '<span style="color: #0d9488; background-color: #ccfbf1; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 12px;">Selesai</span>'
+                status_html = '<span class="status-badge" style="color:#0f766e;background:#ccfbf1;">Selesai</span>'
             elif r['status'] == 'in_progress':
-                status_html = '<span style="color: #d97706; background-color: #fef3c7; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 12px;">In Progress</span>'
+                status_html = '<span class="status-badge" style="color:#b45309;background:#fef3c7;">In Progress</span>'
             else:
-                status_html = '<span style="color: #dc2626; background-color: #fee2e2; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 12px;">Pending</span>'
+                status_html = '<span class="status-badge" style="color:#b91c1c;background:#fee2e2;">Pending</span>'
 
             cols[0].write(idx + 1)
             cols[1].write(r['tanggal'])
@@ -136,7 +150,7 @@ else:
             cols[3].markdown(status_html, unsafe_allow_html=True)
             cols[4].write(r.get('excel_filename') if r.get('excel_path') else "-")
             cols[5].write(r.get('catatan_khusus') if r.get('catatan_khusus') else "-")
-            
-            # Tombol Aksi "Detail" Langsung di Kolom Terakhir
+
+            # Tombol Detail berada langsung di kolom Aksi pada baris yang sama
             if cols[6].button("Detail", key=f"btn_row_{r['id']}"):
                 show_detail_modal(r)
