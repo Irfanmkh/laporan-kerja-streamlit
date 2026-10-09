@@ -161,6 +161,11 @@ else:
             div[data-testid="column"]:nth-child(1) { min-width: 40px !important; }
             div[data-testid="column"]:nth-child(7) { min-width: 80px !important; }
         }
+        /* Sembunyikan Header Atas (Ikon GitHub, Fork, Menu Titik Tiga) */
+        header {visibility: hidden;}
+        #MainMenu {visibility: hidden;}
+        # footer {visibility: hidden;}
+    </style>
         </style>
     """, unsafe_allow_html=True)
 
