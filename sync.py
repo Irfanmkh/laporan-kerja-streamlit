@@ -81,12 +81,19 @@ def fetch_data_from_odoo():
 def auto_git_push():
     try:
         print("Pushing updates to GitHub...")
+        # Cek apakah ada perubahan file (excel, json, ss)
+        status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        
+        if not status.stdout.strip():
+            print("ℹ️ Tidak ada perubahan data baru dari Odoo. Push dilewati.")
+            return
+
         subprocess.run(["git", "add", "."], check=True)
         subprocess.run(["git", "commit", "-m", "Auto-sync update data laporan dari Odoo"], check=True)
         subprocess.run(["git", "push"], check=True)
         print("🚀 Successfully synced with GitHub!")
     except Exception as e:
-        print("⚠️ Git push skipped or failed:", e)
+        print("⚠️ Git push error:", e)
 
 if __name__ == '__main__':
     fetch_data_from_odoo()
