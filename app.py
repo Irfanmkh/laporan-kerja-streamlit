@@ -33,9 +33,9 @@ def format_to_wib(dt_input):
 if os.path.exists(JSON_FILE):
     mtime = os.path.getmtime(JSON_FILE)
     last_updated_wib = datetime.fromtimestamp(mtime, tz=WIB).strftime('%d-%m-%Y %H:%M WIB')
-    st.caption(f"🕒 **Terakhir disinkronisasi server:** {last_updated_wib} (GMT+7)")
+    st.caption(f"**Terakhir disinkronisasi server:** {last_updated_wib} (GMT+7)")
 else:
-    st.caption("🕒 Belum ada data yang disinkronisasi.")
+    st.caption("Belum ada data yang disinkronisasi.")
 
 # Helper Slug URL
 def create_slug(title):
@@ -244,7 +244,7 @@ else:
 
             cols[0].write(idx + 1)
             # Menampilkan Tanggal Laporan & Timestamp GMT+7 di bawahnya
-            cols[1].markdown(f"**{r['tanggal']}**<div class='timestamp-sub'>🕒 {item_ts}</div>", unsafe_allow_html=True)
+            cols[1].markdown(f"**{r['tanggal']}**<div class='timestamp-sub'>last updated: {item_ts}</div>", unsafe_allow_html=True)
             cols[2].write(r['judul'])
             cols[3].markdown(status_html, unsafe_allow_html=True)
             
