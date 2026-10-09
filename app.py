@@ -2,22 +2,20 @@ import streamlit as st
 import pandas as pd
 import json
 import os
-import re  # Tambahkan modul regex untuk membuat slug
+import re
 
 st.set_page_config(page_title="Laporan Data Kerja", layout="wide")
 
 st.title("Laporan Data Kerja")
-# st.caption("Daftar laporan pekerjaan harian")
 
 JSON_FILE = "data/laporan.json"
 
-# Fungsi Helper untuk mengubah Judul menjadi Slug URL
+# Fungsi Helper untuk membuat Slug URL
 def create_slug(title):
-    # Ubah ke huruf kecil
-    slug = title.lower()
-    # Ganti semua karakter selain huruf dan angka menjadi tanda hubung (-)
+    if not title:
+        return "laporan"
+    slug = str(title).lower()
     slug = re.sub(r'[^a-z0-9]+', '-', slug)
-    # Hapus tanda hubung di awal/akhir jika ada
     return slug.strip('-')
 
 # Dialog Modal untuk Detail Laporan
@@ -70,9 +68,37 @@ else:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         reports = json.load(f)
 
-    # Tambahkan slug ke masing-masing data laporan
+    # ---------------------------------------------------------
+    # PERSIAPAN DATA: SLUG & EKSTRAKSI BULAN UNTUK FILTER
+    # ---------------------------------------------------------
+    bulan_map = {
+        '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+        '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+        '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+    }
+
+    unique_months_dict = {}
+
     for r in reports:
+        # Tambahkan Slug
         r['slug'] = create_slug(r['judul'])
+        
+        # Ekstrak Bulan & Tahun dari tanggal
+        try:
+            # pd.to_datetime sangat aman untuk membaca berbagai format tanggal (YYYY-MM-DD atau DD-MM-YYYY)
+            dt = pd.to_datetime(r['tanggal'], dayfirst=True)
+            r['bulan_filter'] = f"{bulan_map[dt.strftime('%m')]} {dt.strftime('%Y')}"
+            r['bulan_sort'] = dt.strftime('%Y-%m') # Format ini dipakai agar bulan terbaru bisa diurutkan di atas
+        except:
+            r['bulan_filter'] = "Tidak Diketahui"
+            r['bulan_sort'] = "0000-00"
+            
+        if r['bulan_filter'] != "Tidak Diketahui":
+            unique_months_dict[r['bulan_filter']] = r['bulan_sort']
+
+    # Mengurutkan daftar filter bulan dari yang paling baru
+    sorted_months = sorted(unique_months_dict.keys(), key=lambda x: unique_months_dict[x], reverse=True)
+    list_filter_bulan = ["Semua Bulan"] + sorted_months
 
     # ---------------------------------------------------------
     # FITUR SHARE LINK (URL PARAMETER MENGGUNAKAN SLUG)
@@ -80,42 +106,52 @@ else:
     if "modal_opened_from_url" not in st.session_state:
         st.session_state.modal_opened_from_url = False
 
-    # Membaca URL parameter ?laporan=slug-judul
     if "laporan" in st.query_params and not st.session_state.modal_opened_from_url:
         target_slug = st.query_params["laporan"]
         status_map = {'done': 'Selesai', 'in_progress': 'In Progress', 'pending': 'Pending'}
         
-        # Cari laporan berdasarkan slug, bukan ID
         target_report = next((r for r in reports if r['slug'] == target_slug), None)
         if target_report:
             target_report['status_label'] = status_map.get(target_report['status'], target_report['status'])
             st.session_state.modal_opened_from_url = True
             show_detail_modal(target_report)
 
-    # Filter & Search Header
-    col_search, col_filter = st.columns([3, 1])
+    # ---------------------------------------------------------
+    # HEADER: PENCARIAN & FILTER
+    # ---------------------------------------------------------
+    # Formasi kolom diubah agar Search lebih panjang, Bulan dan Status menyesuaikan
+    col_search, col_month, col_status = st.columns([2, 1, 1])
     with col_search:
         search_query = st.text_input("Cari laporan...", "")
-    with col_filter:
+    with col_month:
+        month_filter = st.selectbox("Filter Bulan", list_filter_bulan)
+    with col_status:
         status_filter = st.selectbox("Filter Status", ["Semua", "Selesai", "In Progress", "Pending"])
 
     status_map = {'done': 'Selesai', 'in_progress': 'In Progress', 'pending': 'Pending'}
 
+    # ---------------------------------------------------------
+    # PROSES PENYARINGAN DATA (FILTERING)
+    # ---------------------------------------------------------
     filtered_reports = []
     for r in reports:
         st_label = status_map.get(r['status'], r['status'])
         
         match_search = search_query.lower() in r['judul'].lower() or search_query.lower() in r.get('deskripsi', '').lower()
         match_status = (status_filter == "Semua") or (status_filter == st_label)
+        match_month = (month_filter == "Semua Bulan") or (r.get('bulan_filter') == month_filter)
 
-        if match_search and match_status:
+        # Hanya masukkan data jika lolos KETIGA filter sekaligus
+        if match_search and match_status and match_month:
             r['status_label'] = st_label
             filtered_reports.append(r)
 
+    # ---------------------------------------------------------
+    # TAMPILAN TABEL
+    # ---------------------------------------------------------
     if not filtered_reports:
-        st.warning("Tidak ada data laporan yang sesuai.")
+        st.warning("Tidak ada data laporan yang sesuai dengan filter pencarian.")
     else:
-        
         # Style Custom CSS untuk Tabel + MOBILE RESPONSIVE
         st.markdown("""
             <style>
@@ -204,6 +240,5 @@ else:
 
             # Tombol Detail dengan Parameter URL Slug
             if cols[6].button("Detail", key=f"btn_row_{r['id']}"):
-                # Memasukkan slug ke parameter URL saat diklik
                 st.query_params["laporan"] = r['slug']
                 show_detail_modal(r)
