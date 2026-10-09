@@ -41,16 +41,7 @@ def show_detail_modal(report):
             st.write("_Tidak ada catatan khusus._")
 
         st.markdown("**Unduh File Excel:**")
-        if report.get('excel_path') and os.path.exists(report['excel_path']):
-            with open(report['excel_path'], "rb") as ef:
-                st.download_button(
-                    label=f"Unduh {report['excel_filename']}",
-                    data=ef.read(),
-                    file_name=report['excel_filename'],
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    key=f"dl_modal_{report['id']}"
-                )
-
+       
     with col_img:
         st.markdown("**Bukti Screenshot:**")
         ss_list = report.get('ss_list', [])
