@@ -239,9 +239,9 @@ else:
             if r.get('excel_path') and os.path.exists(r['excel_path']):
                 with open(r['excel_path'], "rb") as ef:
                     cols[4].download_button(
-                        label=f" {r.get('excel_filename', 'Download')}",
+                        label=f"{r.get('excel_filename', 'Download')}",
                         data=ef.read(),
-                       
+                        file_name=r.get('excel_filename', 'laporan.xlsx'),
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         key=f"dl_table_{r['id']}"
                     )
