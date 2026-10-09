@@ -3,13 +3,46 @@
         "id": 1,
         "judul": "SHOPEE 26th Anniversary Carolina Watch",
         "tanggal": "2026-10-09",
-        "updated_at": "2026-10-09 08:36:39",
+        "updated_at": "2026-10-09 09:21:48",
         "status": "done",
         "deskripsi": "SHOPEE 26th Anniversary Carolina Watch 10-31 OCTOBER 2026 \n\n- FLASH SALE every day from 12:00-18:00 !\n- Special LIVE Price ac , bonia , casio , g-shock , alba 1 sku/brand ini. jd setiap sesi live ada 5 sku yg harga special live\n- 26th Anniversary Super Voucher - Voucher up to 260k!\n- 26th Anniversary Mega Sale - Disc. up to 60% off!\n",
         "catatan_khusus": "periode promo 10-31 OCTOBER 2026",
         "excel_path": "data/uploads/excel_1_SHOPEE 26th anniv.xlsx",
         "excel_filename": "SHOPEE 26th anniv.xlsx",
-        "ss_list": []
+        "ss_list": [
+            {
+                "path": "data/uploads/ss_1_7.png",
+                "desc": "special live 10.10.1"
+            },
+            {
+                "path": "data/uploads/ss_1_8.png",
+                "desc": "special live 10.10.2"
+            },
+            {
+                "path": "data/uploads/ss_1_9.png",
+                "desc": "special live 11.10.1"
+            },
+            {
+                "path": "data/uploads/ss_1_10.png",
+                "desc": "special live 11.10.2"
+            },
+            {
+                "path": "data/uploads/ss_1_11.png",
+                "desc": "FS 10.10"
+            },
+            {
+                "path": "data/uploads/ss_1_12.png",
+                "desc": "FS 10.10.2"
+            },
+            {
+                "path": "data/uploads/ss_1_13.png",
+                "desc": "FS 10.10.3"
+            },
+            {
+                "path": "data/uploads/ss_1_14.png",
+                "desc": "FS 11.10"
+            }
+        ]
     },
     {
         "id": 2,
