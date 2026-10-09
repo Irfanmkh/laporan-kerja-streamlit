@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import os
-import re
+import re  # Tambahkan modul regex untuk membuat slug
 
 st.set_page_config(page_title="Laporan Data Kerja", layout="wide")
 
@@ -11,6 +11,7 @@ st.title("Laporan Data Kerja")
 
 JSON_FILE = "data/laporan.json"
 
+# Fungsi Helper untuk mengubah Judul menjadi Slug URL
 def create_slug(title):
     # Ubah ke huruf kecil
     slug = title.lower()
@@ -152,18 +153,15 @@ else:
 
             /* --- CSS RESPONSIVE MOBILE HORIZONTAL SCROLL --- */
             @media (max-width: 768px) {
-                /* Memaksa st.columns agar tidak turun ke bawah (stack) di HP, jadinya bisa di geser/scroll ke samping */
                 div[data-testid="stHorizontalBlock"] {
                     flex-wrap: nowrap !important;
                     overflow-x: auto !important;
                     -webkit-overflow-scrolling: touch;
                     padding-bottom: 10px;
                 }
-                /* Menjaga lebar minimum kolom agar teks tidak tergencet/berantakan */
                 div[data-testid="column"] {
                     min-width: 130px !important;
                 }
-                /* Mengatur lebar spesifik untuk kolom No dan Aksi */
                 div[data-testid="column"]:nth-child(1) {
                     min-width: 40px !important;
                 }
@@ -204,8 +202,8 @@ else:
             cols[4].write(r.get('excel_filename') if r.get('excel_path') else "-")
             cols[5].write(r.get('catatan_khusus') if r.get('catatan_khusus') else "-")
 
-            # Tombol Detail dengan Set Parameter URL
+            # Tombol Detail dengan Parameter URL Slug
             if cols[6].button("Detail", key=f"btn_row_{r['id']}"):
-                # Menambahkan ?report_id=ID ke URL di browser
-                st.query_params["report_id"] = r['id']
+                # Memasukkan slug ke parameter URL saat diklik
+                st.query_params["laporan"] = r['slug']
                 show_detail_modal(r)
