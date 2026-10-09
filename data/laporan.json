@@ -9,5 +9,29 @@
         "excel_path": "data/uploads/excel_1_SHOPEE 26th anniv.xlsx",
         "excel_filename": "SHOPEE 26th anniv.xlsx",
         "ss_list": []
+    },
+    {
+        "id": 2,
+        "judul": "WEBSITE CAROLINAWATCH.ID 26th Anniversary Carolina Watch",
+        "tanggal": "2026-10-09",
+        "status": "done",
+        "deskripsi": "10-31 OCTOBER 2026\n\n🎟️ Anniversary Promo\n26th Anniversary Mega Sale - Disc. up to 60% off!\n26th Anniversary Super Voucher - Voucher up to 260k!\nVoucher 26k for min. spend Rp 500.000 (use code: BIRTHDAY26)\nVoucher 126k for min. spend Rp 1.500.000 (use code: BIRTHDAY126)\nVoucher 260k for min. spend Rp 3.000.000 (use code: BIRTHDAY260)\n*Voucher CAN NOT be combined with other promotions & NOT APPLIED for brand: GARMIN, REGAN HARNEY, TIMEX & All CLEARANCE SALE products\n",
+        "catatan_khusus": "",
+        "excel_path": null,
+        "excel_filename": "Download Excel",
+        "ss_list": [
+            {
+                "path": "data/uploads/ss_2_4.png",
+                "desc": "Screenshot 1"
+            },
+            {
+                "path": "data/uploads/ss_2_5.png",
+                "desc": "Screenshot 2"
+            },
+            {
+                "path": "data/uploads/ss_2_6.png",
+                "desc": "Screenshot 3"
+            }
+        ]
     }
 ]
