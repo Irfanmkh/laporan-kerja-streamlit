@@ -6,7 +6,7 @@ import os
 st.set_page_config(page_title="Laporan Data Kerja", layout="wide")
 
 st.title("Laporan Data Kerja")
-st.caption("Daftar laporan pekerjaan harian")
+# st.caption("Daftar laporan pekerjaan harian")
 
 JSON_FILE = "data/laporan.json"
 
@@ -60,6 +60,26 @@ else:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         reports = json.load(f)
 
+    # ---------------------------------------------------------
+    # FITUR SHARE LINK (MEMBACA ENDPOINT PARAMETER URL)
+    # ---------------------------------------------------------
+    # Mencegah modal terbuka berkali-kali saat berinteraksi dengan halaman
+    if "modal_opened_from_url" not in st.session_state:
+        st.session_state.modal_opened_from_url = False
+
+    # Jika ada ?report_id= di URL, cari laporannya dan otomatis buka modal
+    if "report_id" in st.query_params and not st.session_state.modal_opened_from_url:
+        target_id = st.query_params["report_id"]
+        status_map = {'done': 'Selesai', 'in_progress': 'In Progress', 'pending': 'Pending'}
+        
+        # Cari laporan berdasarkan ID dari URL
+        target_report = next((r for r in reports if str(r['id']) == str(target_id)), None)
+        if target_report:
+            # Set label status agar tidak error saat di-pass ke modal
+            target_report['status_label'] = status_map.get(target_report['status'], target_report['status'])
+            st.session_state.modal_opened_from_url = True
+            show_detail_modal(target_report)
+
     # Filter & Search Header
     col_search, col_filter = st.columns([3, 1])
     with col_search:
@@ -83,8 +103,8 @@ else:
     if not filtered_reports:
         st.warning("Tidak ada data laporan yang sesuai.")
     else:
-       
-        # Style Custom CSS untuk Tabel
+        
+        # Style Custom CSS untuk Tabel + MOBILE RESPONSIVE
         st.markdown("""
             <style>
             .table-header {
@@ -117,6 +137,28 @@ else:
                 font-size: 13px;
                 font-weight: 500;
                 border-radius: 6px;
+            }
+
+            /* --- CSS RESPONSIVE MOBILE HORIZONTAL SCROLL --- */
+            @media (max-width: 768px) {
+                /* Memaksa st.columns agar tidak turun ke bawah (stack) di HP, jadinya bisa di geser/scroll ke samping */
+                div[data-testid="stHorizontalBlock"] {
+                    flex-wrap: nowrap !important;
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch;
+                    padding-bottom: 10px;
+                }
+                /* Menjaga lebar minimum kolom agar teks tidak tergencet/berantakan */
+                div[data-testid="column"] {
+                    min-width: 130px !important;
+                }
+                /* Mengatur lebar spesifik untuk kolom No dan Aksi */
+                div[data-testid="column"]:nth-child(1) {
+                    min-width: 40px !important;
+                }
+                div[data-testid="column"]:nth-child(7) {
+                    min-width: 80px !important;
+                }
             }
             </style>
         """, unsafe_allow_html=True)
@@ -151,6 +193,8 @@ else:
             cols[4].write(r.get('excel_filename') if r.get('excel_path') else "-")
             cols[5].write(r.get('catatan_khusus') if r.get('catatan_khusus') else "-")
 
-            # Tombol Detail berada langsung di kolom Aksi pada baris yang sama
+            # Tombol Detail dengan Set Parameter URL
             if cols[6].button("Detail", key=f"btn_row_{r['id']}"):
+                # Menambahkan ?report_id=ID ke URL di browser
+                st.query_params["report_id"] = r['id']
                 show_detail_modal(r)
