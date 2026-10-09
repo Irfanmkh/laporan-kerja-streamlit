@@ -3,12 +3,26 @@ import pandas as pd
 import json
 import os
 import re
+from datetime import datetime  # <-- Tambahkan ini untuk membaca waktu
 
 st.set_page_config(page_title="Laporan Data Kerja", layout="wide")
 
 st.title("Laporan Data Kerja")
 
 JSON_FILE = "data/laporan.json"
+
+# ---------------------------------------------------------
+# FITUR TIMESTAMP TERAKHIR DIUPDATE
+# ---------------------------------------------------------
+if os.path.exists(JSON_FILE):
+    # Membaca waktu modifikasi terakhir file laporan.json
+    mtime = os.path.getmtime(JSON_FILE)
+    # Ubah formatnya menjadi Tanggal-Bulan-Tahun Jam:Menit
+    last_updated = datetime.fromtimestamp(mtime).strftime('%d-%m-%Y %H:%M')
+    st.caption(f"🕒 **Terakhir disinkronisasi:** {last_updated}")
+else:
+    st.caption("🕒 Belum ada data yang disinkronisasi.")
+# ---------------------------------------------------------
 
 # Fungsi Helper untuk membuat Slug URL
 def create_slug(title):
@@ -86,7 +100,6 @@ else:
         
         # Ekstrak Bulan & Tahun dari tanggal
         try:
-           
             dt = pd.to_datetime(r['tanggal'])
             r['bulan_filter'] = f"{bulan_map[dt.strftime('%m')]} {dt.strftime('%Y')}"
             r['bulan_sort'] = dt.strftime('%Y-%m')
@@ -120,7 +133,6 @@ else:
     # ---------------------------------------------------------
     # HEADER: PENCARIAN & FILTER
     # ---------------------------------------------------------
-    # Formasi kolom diubah agar Search lebih panjang, Bulan dan Status menyesuaikan
     col_search, col_month, col_status = st.columns([2, 1, 1])
     with col_search:
         search_query = st.text_input("Cari laporan...", "")
@@ -236,6 +248,7 @@ else:
             cols[1].write(r['tanggal'])
             cols[2].write(r['judul'])
             cols[3].markdown(status_html, unsafe_allow_html=True)
+            
             # --- bisa diunduh
             if r.get('excel_path') and os.path.exists(r['excel_path']):
                 with open(r['excel_path'], "rb") as ef:
@@ -249,6 +262,7 @@ else:
             else:
                 cols[4].write("-")
             # -------------------------------------
+            
             cols[5].write(r.get('catatan_khusus') if r.get('catatan_khusus') else "-")
 
             # Tombol Detail dengan Parameter URL Slug
