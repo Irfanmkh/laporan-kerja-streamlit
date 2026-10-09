@@ -85,10 +85,10 @@ else:
         
         # Ekstrak Bulan & Tahun dari tanggal
         try:
-            # pd.to_datetime sangat aman untuk membaca berbagai format tanggal (YYYY-MM-DD atau DD-MM-YYYY)
-            dt = pd.to_datetime(r['tanggal'], dayfirst=True)
+           
+            dt = pd.to_datetime(r['tanggal'])
             r['bulan_filter'] = f"{bulan_map[dt.strftime('%m')]} {dt.strftime('%Y')}"
-            r['bulan_sort'] = dt.strftime('%Y-%m') # Format ini dipakai agar bulan terbaru bisa diurutkan di atas
+            r['bulan_sort'] = dt.strftime('%Y-%m')
         except:
             r['bulan_filter'] = "Tidak Diketahui"
             r['bulan_sort'] = "0000-00"
