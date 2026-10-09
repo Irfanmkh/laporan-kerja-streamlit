@@ -30,9 +30,9 @@ def format_to_wib(dt_input):
 if os.path.exists(JSON_FILE):
     mtime = os.path.getmtime(JSON_FILE)
     last_updated_wib = datetime.fromtimestamp(mtime, tz=WIB).strftime('%d-%m-%Y %H:%M WIB')
-    st.caption(f"🕒 **Terakhir disinkronisasi server:** {last_updated_wib}")
+    st.caption(f"**Terakhir disinkronisasi server:** {last_updated_wib}")
 else:
-    st.caption("🕒 Belum ada data yang disinkronisasi.")
+    st.caption(" Belum ada data yang disinkronisasi.")
 
 def create_slug(title):
     if not title:
