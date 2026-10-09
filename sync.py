@@ -23,27 +23,26 @@ def fetch_data_from_odoo():
     uid = common.authenticate(ODOO_DB, ODOO_USER, ODOO_PASS, {})
 
     if not uid:
-        print("❌ Login Odoo Gagal! Periksa DB, Email, atau Password.")
+        print("❌ Login Odoo Gagal!")
         return
 
     print("✅ Authenticated successfully!")
     models = xmlrpc.client.ServerProxy(f'{ODOO_URL}/xmlrpc/2/object')
 
-    # Fetch semua record dari model 'laporan.pekerjaan'
     reports = models.execute_kw(
         ODOO_DB, uid, ODOO_PASS,
         'laporan.pekerjaan', 'search_read',
         [[]],
-        {'fields': ['id', 'name', 'tanggal', 'status', 'deskripsi', 'file_excel', 'excel_filename', 'bukti_ss']}
+        {'fields': ['id', 'name', 'tanggal', 'status', 'deskripsi', 'catatan_khusus', 'file_excel', 'excel_filename', 'bukti_ss_ids']}
     )
 
     clean_reports = []
 
     for r in reports:
         excel_rel_path = None
-        ss_rel_path = None
+        ss_paths = []
 
-        # Simpan file Excel jika ada
+        # Unduh Excel
         if r.get('file_excel') and r.get('excel_filename'):
             excel_bytes = base64.b64decode(r['file_excel'])
             filename = f"excel_{r['id']}_{r['excel_filename']}"
@@ -52,27 +51,39 @@ def fetch_data_from_odoo():
                 f.write(excel_bytes)
             excel_rel_path = f"data/uploads/{filename}"
 
-        # Simpan Gambar Screenshot jika ada
-        if r.get('bukti_ss'):
-            ss_bytes = base64.b64decode(r['bukti_ss'])
-            filename = f"ss_{r['id']}.png"
-            filepath = os.path.join(UPLOADS_DIR, filename)
-            with open(filepath, 'wb') as f:
-                f.write(ss_bytes)
-            ss_rel_path = f"data/uploads/{filename}"
+        # Unduh Banyak Screenshot dari Model laporan.pekerjaan.ss
+        ss_ids = r.get('bukti_ss_ids', [])
+        if ss_ids:
+            ss_records = models.execute_kw(
+                ODOO_DB, uid, ODOO_PASS,
+                'laporan.pekerjaan.ss', 'search_read',
+                [[['id', 'in', ss_ids]]],
+                {'fields': ['id', 'image', 'description']}
+            )
+            for index, ss in enumerate(ss_records):
+                if ss.get('image'):
+                    ss_bytes = base64.b64decode(ss['image'])
+                    filename = f"ss_{r['id']}_{ss['id']}.png"
+                    filepath = os.path.join(UPLOADS_DIR, filename)
+                    with open(filepath, 'wb') as f:
+                        f.write(ss_bytes)
+                    ss_paths.append({
+                        'path': f"data/uploads/{filename}",
+                        'desc': ss.get('description') or f"Screenshot {index + 1}"
+                    })
 
         clean_reports.append({
             'id': r['id'],
             'judul': r['name'],
             'tanggal': r['tanggal'],
             'status': r['status'],
-            'deskripsi': r['deskripsi'] or '',
+            'deskripsi': r.get('deskripsi') or '',
+            'catatan_khusus': r.get('catatan_khusus') or '',
             'excel_path': excel_rel_path,
             'excel_filename': r.get('excel_filename') or 'Download Excel',
-            'ss_path': ss_rel_path
+            'ss_list': ss_paths
         })
 
-    # Simpan ke laporan.json
     with open(JSON_FILE, 'w', encoding='utf-8') as f:
         json.dump(clean_reports, f, indent=4, ensure_ascii=False)
 
@@ -81,7 +92,6 @@ def fetch_data_from_odoo():
 def auto_git_push():
     try:
         print("Pushing updates to GitHub...")
-        # Cek apakah ada perubahan file (excel, json, ss)
         status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
         
         if not status.stdout.strip():
