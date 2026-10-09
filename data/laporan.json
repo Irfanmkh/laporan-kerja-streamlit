@@ -8,6 +8,15 @@
         "catatan_khusus": "",
         "excel_path": "data/uploads/excel_1_promo sep okt.xlsx",
         "excel_filename": "promo sep okt.xlsx",
-        "ss_list": []
+        "ss_list": [
+            {
+                "path": "data/uploads/ss_1_1.png",
+                "desc": "tes"
+            },
+            {
+                "path": "data/uploads/ss_1_2.png",
+                "desc": "tes"
+            }
+        ]
     }
 ]
