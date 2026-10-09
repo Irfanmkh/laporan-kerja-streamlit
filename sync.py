@@ -3,6 +3,7 @@ import json
 import base64
 import os
 import subprocess
+from datetime import datetime, timezone, timedelta  # <-- Tambahan modul datetime
 
 # 1. Konfigurasi Odoo Lokal
 ODOO_URL = 'http://localhost:8069'
@@ -17,6 +18,9 @@ JSON_FILE = os.path.join(DATA_DIR, 'laporan.json')
 
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
+# Definisikan Zona Waktu WIB (GMT+7)
+WIB = timezone(timedelta(hours=7))
+
 def fetch_data_from_odoo():
     print("Connecting to Odoo...")
     common = xmlrpc.client.ServerProxy(f'{ODOO_URL}/xmlrpc/2/common')
@@ -29,11 +33,14 @@ def fetch_data_from_odoo():
     print("✅ Authenticated successfully!")
     models = xmlrpc.client.ServerProxy(f'{ODOO_URL}/xmlrpc/2/object')
 
+    # Format timestamp WIB saat proses sync dijalankan
+    now_wib_str = datetime.now(WIB).strftime('%Y-%m-%d %H:%M:%S')
+
     reports = models.execute_kw(
         ODOO_DB, uid, ODOO_PASS,
         'laporan.pekerjaan', 'search_read',
         [[]],
-        {'fields': ['id', 'name', 'tanggal', 'status', 'deskripsi', 'catatan_khusus', 'file_excel', 'excel_filename', 'bukti_ss_ids']}
+        {'fields': ['id', 'name', 'tanggal', 'status', 'deskripsi', 'catatan_khusus', 'file_excel', 'excel_filename', 'bukti_ss_ids', 'write_date']}
     )
 
     clean_reports = []
@@ -72,10 +79,14 @@ def fetch_data_from_odoo():
                         'desc': ss.get('description') or f"Screenshot {index + 1}"
                     })
 
+        # Gunakan write_date dari Odoo atau waktu WIB saat sync jika kosong
+        updated_at_val = r.get('write_date') or now_wib_str
+
         clean_reports.append({
             'id': r['id'],
             'judul': r['name'],
             'tanggal': r['tanggal'],
+            'updated_at': updated_at_val,  # <-- Timestamp jam & menit untuk Streamlit
             'status': r['status'],
             'deskripsi': r.get('deskripsi') or '',
             'catatan_khusus': r.get('catatan_khusus') or '',
