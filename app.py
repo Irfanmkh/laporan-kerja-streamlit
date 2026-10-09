@@ -19,7 +19,7 @@ def create_slug(title):
     return slug.strip('-')
 
 # Dialog Modal untuk Detail Laporan
-@st.dialog("Detail Laporan Pekerjaan", width="large")
+@st.dialog("Detail Laporan", width="large")
 def show_detail_modal(report):
     col_info, col_img = st.columns([3, 2])
     
