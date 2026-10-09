@@ -16,6 +16,10 @@
             {
                 "path": "data/uploads/ss_1_2.png",
                 "desc": "tes"
+            },
+            {
+                "path": "data/uploads/ss_1_3.png",
+                "desc": "Screenshot 3"
             }
         ]
     }
