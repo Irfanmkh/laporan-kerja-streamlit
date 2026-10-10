@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 
 st.set_page_config(page_title="Laporan Data Kerja", layout="wide")
 
-st.title("Laporan Data Kerja")
+st.title("Data Laporan")
 
 JSON_FILE = "data/laporan.json"
 WIB = timezone(timedelta(hours=7))
@@ -42,7 +42,7 @@ def create_slug(title):
     return slug.strip('-')
 
 # --- DEKLARASI MODAL DIALOG ---
-@st.dialog("Detail Laporan Pekerjaan", width="large")
+@st.dialog("Detail Laporan ", width="large")
 def show_detail_modal(report):
     col_info, col_img = st.columns([3, 2])
     
@@ -57,7 +57,7 @@ def show_detail_modal(report):
         status_map = {'done': 'Selesai', 'in_progress': 'In Progress', 'pending': 'Pending'}
         st.write(f"**Status:** {status_map.get(report['status'], report['status'])}")
         
-        st.markdown("**Deskripsi:**")
+        st.markdown("**Deskripsi Pekerjaan:**")
         st.write(report.get('deskripsi') or "_Tidak ada deskripsi._")
             
         st.markdown("**Catatan Khusus:**")
@@ -66,9 +66,11 @@ def show_detail_modal(report):
         else:
             st.write("_Tidak ada catatan khusus._")
 
-        st.markdown("**Unduh File Excel:**")
-        if report.get('excel_path') and os.path.exists(report['excel_path']):
-            with open(report['excel_path'], "rb") as ef:
+        # --- HANYA TAMPILKAN JIKA LAPORAN INI BENAR-BENAR PUNYA EXCEL ---
+        excel_path = report.get('excel_path')
+        if excel_path and os.path.exists(excel_path):
+            st.markdown("**Unduh File Excel:**")
+            with open(excel_path, "rb") as ef:
                 st.download_button(
                     label=f"Unduh {report.get('excel_filename', 'Excel')}",
                     data=ef.read(),
@@ -88,7 +90,6 @@ def show_detail_modal(report):
                     st.warning("Gambar tidak ditemukan di server/repo.")
         else:
             st.write("_Tidak ada lampiran screenshot._")
-
 
 # --- MANAGEMENT DATA & SESSION STATE ---
 if not os.path.exists(JSON_FILE):
