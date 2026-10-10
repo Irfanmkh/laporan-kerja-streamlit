@@ -57,7 +57,7 @@ def show_detail_modal(report):
         status_map = {'done': 'Selesai', 'in_progress': 'In Progress', 'pending': 'Pending'}
         st.write(f"**Status:** {status_map.get(report['status'], report['status'])}")
         
-        st.markdown("**Deskripsi Pekerjaan:**")
+        st.markdown("**Deskripsi:**")
         st.write(report.get('deskripsi') or "_Tidak ada deskripsi._")
             
         st.markdown("**Catatan Khusus:**")
