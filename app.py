@@ -78,6 +78,8 @@ def show_detail_modal(report):
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     key=f"dl_modal_{report.get('id', 'default')}"
                 )
+        else:
+            st.write("_Tidak ada lampiran excel._")
 
     with col_img:
         st.markdown("**Bukti Screenshot:**")
