@@ -68,5 +68,17 @@
                 "desc": "BIRTHDAY260"
             }
         ]
+    },
+    {
+        "id": 3,
+        "judul": "LAZADA 10.10",
+        "tanggal": "2026-10-10",
+        "updated_at": "2026-10-10 06:02:20",
+        "status": "done",
+        "deskripsi": "produk stok banyak disc normal + 1 %",
+        "catatan_khusus": "Campaign 10.10",
+        "excel_path": "data/uploads/excel_3_D10 - CAROLINA Pricing (3) (1).xlsx",
+        "excel_filename": "D10 - CAROLINA Pricing (3) (1).xlsx",
+        "ss_list": []
     }
 ]
