@@ -80,17 +80,5 @@
         "excel_path": "data/uploads/excel_3_D10 - CAROLINA Pricing (3) (1).xlsx",
         "excel_filename": "D10 - CAROLINA Pricing (3) (1).xlsx",
         "ss_list": []
-    },
-    {
-        "id": 4,
-        "judul": "tess",
-        "tanggal": "2026-10-12",
-        "updated_at": "2026-10-12 04:13:51",
-        "status": "done",
-        "deskripsi": "asa",
-        "catatan_khusus": "",
-        "excel_path": null,
-        "excel_filename": "Download Excel",
-        "ss_list": []
     }
 ]
